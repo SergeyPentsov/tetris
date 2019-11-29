@@ -38,7 +38,8 @@ public class Board {
                 continue;
             }
             if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
-                continue;
+                addFigurePointsToFillPoints(activeFigure);
+                activeFigure = figureBuilder.next(startFigurePoint);
             }
             activeFigure = nextFigure;
         }
@@ -59,7 +60,7 @@ public class Board {
     // TODO: 11/26/2019 rename
     public boolean isValidFigureCoordinates(Figure figure) {
         for (Point point : figure.getPointsByBoardCoordinates()) {
-            if (point.getX() < 0 || point.getX() > width || point.getY() > height) return false;
+            if (point.getX() < 0 || point.getX() > width - 1 || point.getY() > height - 1) return false;
         }
         return true;
     }
