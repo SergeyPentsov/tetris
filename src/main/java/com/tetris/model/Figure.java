@@ -1,23 +1,25 @@
 package com.tetris.model;
 
 import com.tetris.model.MoveEvent.MoveEventType;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.tetris.model.MoveEvent.MoveEventType.*;
+import static com.tetris.model.MoveEvent.MoveEventType.LEFT_ROTATE;
+import static com.tetris.model.MoveEvent.MoveEventType.RIGHT_ROTATE;
 
+
+@Data
+@Builder
+@Slf4j
 public class Figure {
 
     private final List<Point> points;
     private final Point pivot;
     private final Point currentCoordinateOnBoard;
-
-    private Figure(List<Point> points, Point pivot, Point currentCoordinatesOnBoard) {
-        this.points = points;
-        this.pivot = pivot;
-        this.currentCoordinateOnBoard = currentCoordinatesOnBoard;
-    }
 
 
     public Figure getNewFigureByMoveEventType(MoveEventType eventType) {
@@ -25,6 +27,7 @@ public class Figure {
     }
 
     private Figure move(MoveEventType eventType) {
+        log.debug("Figure move event {}",eventType);
         Point newCoordinateOnBoard;
         switch (eventType) {
             case MOVE_RIGHT: {
@@ -49,100 +52,29 @@ public class Figure {
     }
 
     private Figure rotate(MoveEventType eventType) {
+        log.debug("Figure rotate event {}", eventType);
         if (eventType == LEFT_ROTATE) {
-            List<Point> newPoints = new ArrayList<>();
-            for (Point point : points) {
-                newPoints.add(new Point(getPointByPivot(point).getY() * -1, getPointByPivot(point).getX()));
-            }
-            return new Figure(newPoints, pivot, currentCoordinateOnBoard);
+            return new Figure(points.stream()
+                    .map(point -> new Point(getPointByPivot(point).getY() * -1, getPointByPivot(point).getX()))
+                    .collect(Collectors.toList()), pivot, currentCoordinateOnBoard);
         }
         if (eventType == RIGHT_ROTATE) {
-            List<Point> newPoints = new ArrayList<>();
-            for (Point point : points) {
-                newPoints.add(new Point(getPointByPivot(point).getY(), getPointByPivot(point).getX() * -1));
-            }
-            return new Figure(newPoints, pivot, currentCoordinateOnBoard);
+            return new Figure(points.stream()
+                    .map(point -> new Point(getPointByPivot(point).getY(), getPointByPivot(point).getX() * -1))
+                    .collect(Collectors.toList()), pivot, currentCoordinateOnBoard);
         }
 
         throw new IllegalArgumentException("Invalid rotate state");
     }
 
     public List<Point> getPointsByBoardCoordinates() {
-        List<Point> list = new ArrayList<>();
-        for (Point point : points) {
-            list.add(
-                    new Point(point.getX() + currentCoordinateOnBoard.getX(),
-                            point.getY() + currentCoordinateOnBoard.getY())
-            );
-        }
-        return list;
+        return points.stream().map(point -> new Point(point.getX() + currentCoordinateOnBoard.getX(),
+                point.getY() + currentCoordinateOnBoard.getY())).collect(Collectors.toList());
     }
 
 
     private Point getPointByPivot(Point point) {
         return new Point(point.getX() - pivot.getX(), point.getY() - pivot.getY());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Figure figure = (Figure) o;
-
-        if (!points.equals(figure.points)) return false;
-        if (!pivot.equals(figure.pivot)) return false;
-        return currentCoordinateOnBoard.equals(figure.currentCoordinateOnBoard);
-    }
-
-
-    @Override
-    public int hashCode() {
-        int result = points.hashCode();
-        result = 31 * result + pivot.hashCode();
-        result = 31 * result + currentCoordinateOnBoard.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Figure{" +
-                "points=" + points +
-                ", pivot=" + pivot +
-                ", currentCoordinatesOnBoard=" + currentCoordinateOnBoard +
-                '}';
-    }
-
-    public static class Builder {
-        private List<Point> points;
-        private Point pivot;
-        private Point currentCoordinatesOnBoard;
-
-        public Builder figure(Figure figure) {
-            this.points = figure.points;
-            this.pivot = figure.pivot;
-            this.currentCoordinatesOnBoard = figure.currentCoordinateOnBoard;
-            return this;
-        }
-
-        public Builder points(List<Point> points) {
-            this.points = points;
-            return this;
-        }
-
-        public Builder pivot(Point pivot) {
-            this.pivot = pivot;
-            return this;
-        }
-
-        public Builder currentCoordinatesOnBoard(Point currentCoordinatesOnBoard) {
-            this.currentCoordinatesOnBoard = currentCoordinatesOnBoard;
-            return this;
-        }
-
-        public Figure build() {
-            return new Figure(points, pivot, currentCoordinatesOnBoard);
-        }
     }
 
 }

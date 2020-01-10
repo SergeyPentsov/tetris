@@ -14,10 +14,10 @@ public class FigureTestBuilder implements FigureBuilder {
         testFigurePoints.add(new Point(1, 0));
         testFigurePoints.add(new Point(1, 1));
         testFigurePoints.add(new Point(2, 1));
-        return new Figure.Builder()
+        return Figure.builder()
                 .points(testFigurePoints)
                 .pivot(new Point(1, 1))
-                .currentCoordinatesOnBoard(new Point(boardStartPoint.getX(), boardStartPoint.getY() + 1))
+                .currentCoordinateOnBoard(new Point(boardStartPoint.getX(), boardStartPoint.getY() + 1))
                 .build();
     }
 }

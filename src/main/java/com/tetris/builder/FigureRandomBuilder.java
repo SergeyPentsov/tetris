@@ -2,12 +2,13 @@ package com.tetris.builder;
 
 import com.tetris.model.Figure;
 import com.tetris.model.Point;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FigureRandomBuilder implements FigureBuilder {
 
 
     @Override
     public Figure next(Point boardStartPoint) {
-        return null;
+        throw new NotImplementedException();
     }
 }

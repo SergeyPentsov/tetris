@@ -1,12 +1,15 @@
 package com.tetris.model;
 
 import com.tetris.builder.FigureBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.tetris.model.MoveEvent.MoveEventType.MOVE_DOWN;
 
+@Slf4j
 public class Board {
     private final int height;
     private final int width;
@@ -29,19 +32,24 @@ public class Board {
         while (true) {
             System.out.println(getStringState());
             System.out.println("----------------------------------------------------------------------");
-            MoveEvent moveEvent = player.getNextMoveEvent();
-            Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent.getType());
+            player.getNextMoveEvent().ifPresent(moveEvent -> {
+                Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent.getType());
 
-            if (isValidFigureCoordinates(nextFigure) && !isValidFigurePoints(nextFigure) && moveEvent.getType() == MOVE_DOWN) {
-                addFigurePointsToFillPoints(activeFigure);
-                activeFigure = figureBuilder.next(startFigurePoint);
-                continue;
-            }
-            if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
-                addFigurePointsToFillPoints(activeFigure);
-                activeFigure = figureBuilder.next(startFigurePoint);
-            }
-            activeFigure = nextFigure;
+                if (isValidFigureCoordinates(nextFigure) && !isValidFigurePoints(nextFigure) && moveEvent.getType() == MOVE_DOWN) {
+                    log.debug("Change figure state on the board. Current state {}", activeFigure);
+                    addFigurePointsToFillPoints(activeFigure);
+                    activeFigure = figureBuilder.next(startFigurePoint);
+                    log.debug("Change figure state on the board. New state {}", activeFigure);
+                    return;
+                }
+                if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
+                    log.debug("Add figure to fill points {}", activeFigure);
+                    addFigurePointsToFillPoints(activeFigure);
+                    activeFigure = figureBuilder.next(startFigurePoint);
+                }
+                activeFigure = nextFigure;
+            });
+
         }
 
     }
@@ -49,20 +57,13 @@ public class Board {
 
     // TODO: 11/26/2019 rename
     public boolean isValidFigurePoints(Figure figure) {
-        for (Point point : figure.getPointsByBoardCoordinates()) {
-            if (fillPoints.contains(point)) {
-                return false;
-            }
-        }
-        return true;
+        return figure.getPointsByBoardCoordinates().stream().noneMatch(fillPoints::contains);
     }
 
     // TODO: 11/26/2019 rename
     public boolean isValidFigureCoordinates(Figure figure) {
-        for (Point point : figure.getPointsByBoardCoordinates()) {
-            if (point.getX() < 0 || point.getX() > width - 1 || point.getY() > height - 1) return false;
-        }
-        return true;
+        return figure.getPointsByBoardCoordinates().stream().
+                noneMatch(point -> point.getX() < 0 || point.getX() > width - 1 || point.getY() > height - 1);
     }
 
     public void addFigurePointsToFillPoints(Figure figure) {
@@ -79,14 +80,14 @@ public class Board {
             builder.append('-');
         }
         builder.append('\n');
-        for (char[] chars : charBoard) {
+        Arrays.stream(charBoard).forEach(chars -> {
             builder.append('|');
             for (char character : chars) {
                 builder.append(character);
             }
             builder.append('|');
             builder.append('\n');
-        }
+        });
         for (int i = 0; i < height; i++) {
             builder.append('-');
         }
