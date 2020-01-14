@@ -36,31 +36,27 @@ public class Board {
 
     public GameState doGame(MoveEvent moveEvent) {
         Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent);
-        if (isValidFigureCoordinates(nextFigure) && !isValidFigurePoints(nextFigure) && moveEvent == MOVE_DOWN) {
-            log.debug("Change figure state on the board. Current state {}", activeFigure);
-            addFigurePointsToFillPoints(activeFigure);
-            activeFigure = figureBuilder.next(startFigurePoint);
-            log.debug("Change figure state on the board. New state {}", activeFigure);
-            return FINISH;
-        }
-
-        if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
+        boolean isInvalidMove = !isValidFigureCoordinatesWithinBoard(nextFigure) || !isFigureNotTouchFillPoints(nextFigure);
+        if (isInvalidMove && moveEvent == MOVE_DOWN) {
             log.debug("Add figure to fill points {}", activeFigure);
             addFigurePointsToFillPoints(activeFigure);
             activeFigure = figureBuilder.next(startFigurePoint);
+            log.debug("Change figure state on the board. New state {}", activeFigure);
+            return ACTIVE;
+        }
+        if (isInvalidMove) {
+            return ACTIVE;
         }
         activeFigure = nextFigure;
         return ACTIVE;
     }
 
 
-    // TODO: 11/26/2019 rename
-    public boolean isValidFigurePoints(Figure figure) {
+    public boolean isFigureNotTouchFillPoints(Figure figure) {
         return figure.getPointsByBoardCoordinates().stream().noneMatch(fillPoints::contains);
     }
 
-    // TODO: 11/26/2019 rename
-    public boolean isValidFigureCoordinates(Figure figure) {
+    public boolean isValidFigureCoordinatesWithinBoard(Figure figure) {
         return figure.getPointsByBoardCoordinates().stream().
                 noneMatch(point -> point.getX() < 0 || point.getX() > width - 1 || point.getY() > height - 1);
     }
@@ -73,7 +69,7 @@ public class Board {
     public String getStringState() {
         char[][] charBoard = new char[height][width];
         fillPoints.forEach(point -> charBoard[point.getX()][point.getY()] = '#');
-        activeFigure.getPointsByBoardCoordinates().forEach(point -> charBoard[point.getY()][point.getX()] = '*');
+        activeFigure.getPointsByBoardCoordinates().forEach(point -> charBoard[point.getY()][point.getX()] = 'X');
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < height; i++) {
             builder.append('-');
