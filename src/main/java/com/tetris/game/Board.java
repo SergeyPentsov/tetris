@@ -1,13 +1,19 @@
-package com.tetris.model;
+package com.tetris.game;
 
 import com.tetris.builder.FigureBuilder;
+import com.tetris.game.handler.MoveEvent;
+import com.tetris.game.handler.user.UserMoveHandler;
+import com.tetris.model.GameState;
+import com.tetris.model.Point;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.tetris.model.MoveEvent.MoveEventType.MOVE_DOWN;
+import static com.tetris.game.handler.MoveEvent.MOVE_DOWN;
+import static com.tetris.model.GameState.ACTIVE;
+import static com.tetris.model.GameState.FINISH;
 
 @Slf4j
 public class Board {
@@ -16,7 +22,7 @@ public class Board {
     private final List<Point> fillPoints = new ArrayList<>();
     private Figure activeFigure;
     private final FigureBuilder figureBuilder;
-    private final Player player;
+    private final UserMoveHandler player;
     private final Point startFigurePoint;
 
     public Board(int height, int width, FigureBuilder figureBuilder) {
@@ -25,33 +31,26 @@ public class Board {
         this.figureBuilder = figureBuilder;
         this.startFigurePoint = new Point(width / 2, 0);
         this.activeFigure = figureBuilder.next(startFigurePoint);
-        this.player = new Player();
+        this.player = new UserMoveHandler();
     }
 
-    public void doGame() {
-        while (true) {
-            System.out.println(getStringState());
-            System.out.println("----------------------------------------------------------------------");
-            player.getNextMoveEvent().ifPresent(moveEvent -> {
-                Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent.getType());
-
-                if (isValidFigureCoordinates(nextFigure) && !isValidFigurePoints(nextFigure) && moveEvent.getType() == MOVE_DOWN) {
-                    log.debug("Change figure state on the board. Current state {}", activeFigure);
-                    addFigurePointsToFillPoints(activeFigure);
-                    activeFigure = figureBuilder.next(startFigurePoint);
-                    log.debug("Change figure state on the board. New state {}", activeFigure);
-                    return;
-                }
-                if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
-                    log.debug("Add figure to fill points {}", activeFigure);
-                    addFigurePointsToFillPoints(activeFigure);
-                    activeFigure = figureBuilder.next(startFigurePoint);
-                }
-                activeFigure = nextFigure;
-            });
-
+    public GameState doGame(MoveEvent moveEvent) {
+        Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent);
+        if (isValidFigureCoordinates(nextFigure) && !isValidFigurePoints(nextFigure) && moveEvent == MOVE_DOWN) {
+            log.debug("Change figure state on the board. Current state {}", activeFigure);
+            addFigurePointsToFillPoints(activeFigure);
+            activeFigure = figureBuilder.next(startFigurePoint);
+            log.debug("Change figure state on the board. New state {}", activeFigure);
+            return FINISH;
         }
 
+        if (!isValidFigureCoordinates(nextFigure) || !isValidFigurePoints(nextFigure)) {
+            log.debug("Add figure to fill points {}", activeFigure);
+            addFigurePointsToFillPoints(activeFigure);
+            activeFigure = figureBuilder.next(startFigurePoint);
+        }
+        activeFigure = nextFigure;
+        return ACTIVE;
     }
 
 

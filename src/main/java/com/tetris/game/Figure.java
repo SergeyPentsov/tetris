@@ -1,6 +1,7 @@
-package com.tetris.model;
+package com.tetris.game;
 
-import com.tetris.model.MoveEvent.MoveEventType;
+import com.tetris.game.handler.MoveEvent;
+import com.tetris.model.Point;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.tetris.model.MoveEvent.MoveEventType.LEFT_ROTATE;
-import static com.tetris.model.MoveEvent.MoveEventType.RIGHT_ROTATE;
+import static com.tetris.game.handler.MoveEvent.LEFT_ROTATE;
+import static com.tetris.game.handler.MoveEvent.RIGHT_ROTATE;
 
 
 @Data
@@ -22,11 +23,11 @@ public class Figure {
     private final Point currentCoordinateOnBoard;
 
 
-    public Figure getNewFigureByMoveEventType(MoveEventType eventType) {
+    public Figure getNewFigureByMoveEventType(MoveEvent eventType) {
         return eventType == LEFT_ROTATE || eventType == RIGHT_ROTATE ? rotate(eventType) : move(eventType);
     }
 
-    private Figure move(MoveEventType eventType) {
+    private Figure move(MoveEvent eventType) {
         log.debug("Figure move event {}",eventType);
         Point newCoordinateOnBoard;
         switch (eventType) {
@@ -51,7 +52,7 @@ public class Figure {
         return new Figure(points, pivot, newCoordinateOnBoard);
     }
 
-    private Figure rotate(MoveEventType eventType) {
+    private Figure rotate(MoveEvent eventType) {
         log.debug("Figure rotate event {}", eventType);
         if (eventType == LEFT_ROTATE) {
             return new Figure(points.stream()
