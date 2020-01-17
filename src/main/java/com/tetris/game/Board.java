@@ -2,7 +2,6 @@ package com.tetris.game;
 
 import com.tetris.builder.FigureBuilder;
 import com.tetris.game.handler.MoveEvent;
-import com.tetris.game.handler.user.UserMoveHandler;
 import com.tetris.model.GameState;
 import com.tetris.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import static com.tetris.game.handler.MoveEvent.MOVE_DOWN;
 import static com.tetris.model.GameState.ACTIVE;
-import static com.tetris.model.GameState.FINISH;
 
 @Slf4j
 public class Board {
@@ -22,7 +20,6 @@ public class Board {
     private final List<Point> fillPoints = new ArrayList<>();
     private Figure activeFigure;
     private final FigureBuilder figureBuilder;
-    private final UserMoveHandler player;
     private final Point startFigurePoint;
 
     public Board(int height, int width, FigureBuilder figureBuilder) {
@@ -31,7 +28,6 @@ public class Board {
         this.figureBuilder = figureBuilder;
         this.startFigurePoint = new Point(width / 2, 0);
         this.activeFigure = figureBuilder.next(startFigurePoint);
-        this.player = new UserMoveHandler();
     }
 
     public GameState doGame(MoveEvent moveEvent) {
@@ -68,7 +64,7 @@ public class Board {
 
     public String getStringState() {
         char[][] charBoard = new char[height][width];
-        fillPoints.forEach(point -> charBoard[point.getX()][point.getY()] = '#');
+        fillPoints.forEach(point -> charBoard[point.getY()][point.getX()] = '#');
         activeFigure.getPointsByBoardCoordinates().forEach(point -> charBoard[point.getY()][point.getX()] = 'X');
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < height; i++) {
