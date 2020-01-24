@@ -1,28 +1,29 @@
 package com.tetris.db;
 
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.service.ServiceRegistry;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
+@Slf4j
 public class ConnectionFactory {
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/tetris";
-    private static final String USER_NAME = "postgres";
-    private static final String PASSWORD = "postgres";
+
+    public final static SessionFactory sessionFactory;
 
     static {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().
+                configure("hibernate.cfg.xml").build();
+        Metadata metadata = new MetadataSources(serviceRegistry).getMetadataBuilder().build();
+        sessionFactory = metadata.getSessionFactoryBuilder().build();
+
     }
 
-    @SneakyThrows
-    public static Connection getConnection() {
-        return DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
-    }
 
+    public void init() {
+    }
 
 }

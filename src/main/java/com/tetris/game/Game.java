@@ -1,7 +1,5 @@
 package com.tetris.game;
 
-import com.tetris.db.repositories.impl.MoveRepository;
-import com.tetris.game.handler.MoveEvent;
 import com.tetris.game.handler.MoveHandler;
 import com.tetris.model.GameState;
 import lombok.AllArgsConstructor;

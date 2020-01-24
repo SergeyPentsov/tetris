@@ -1,7 +1,7 @@
 package com.tetris.game;
 
 import com.tetris.builder.FigureBuilder;
-import com.tetris.game.handler.MoveEvent;
+import com.tetris.game.handler.MoveEventType;
 import com.tetris.model.GameState;
 import com.tetris.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.tetris.game.handler.MoveEvent.MOVE_DOWN;
+import static com.tetris.game.handler.MoveEventType.MOVE_DOWN;
 import static com.tetris.model.GameState.ACTIVE;
 
 @Slf4j
@@ -30,7 +30,7 @@ public class Board {
         this.activeFigure = figureBuilder.next(startFigurePoint);
     }
 
-    public GameState doGame(MoveEvent moveEvent) {
+    public GameState doGame(MoveEventType moveEvent) {
         Figure nextFigure = activeFigure.getNewFigureByMoveEventType(moveEvent);
         boolean isInvalidMove = !isValidFigureCoordinatesWithinBoard(nextFigure) || !isFigureNotTouchFillPoints(nextFigure);
         if (isInvalidMove && moveEvent == MOVE_DOWN) {

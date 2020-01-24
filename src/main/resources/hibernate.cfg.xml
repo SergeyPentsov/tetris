@@ -1,0 +1,18 @@
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.password">postgres</property>
+        <property name="hibernate.connection.url">
+            jdbc:postgresql://localhost:5432/tetris
+        </property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.show_sql">true</property>
+
+        <mapping class="com.tetris.db.entity.FigureType"/>
+        <mapping class="com.tetris.db.entity.Game"/>
+        <mapping class="com.tetris.db.entity.Move"/>
+    </session-factory>
+
+</hibernate-configuration>

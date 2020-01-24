@@ -1,7 +1,7 @@
 package com.tetris.game.handler;
 
 
-public enum MoveEvent {
+public enum MoveEventType {
     MOVE_RIGHT,
     MOVE_LEFT,
     MOVE_DOWN,

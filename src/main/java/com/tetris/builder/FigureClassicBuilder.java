@@ -1,9 +1,7 @@
 package com.tetris.builder;
 
-import com.tetris.db.repositories.impl.FigureRepository;
 import com.tetris.game.Figure;
 import com.tetris.model.Point;
-import lombok.AllArgsConstructor;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FigureClassicBuilder extends AbstractFigureBuilder {
